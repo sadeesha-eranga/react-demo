@@ -1,14 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, FormHelperText } from '@material-ui/core';
+import React, { useContext, useState } from 'react';
+import { Button, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 import NumberFormat from 'react-number-format';
 import axios from '../../utils/axios';
 import SwalUtils from '../../utils/SwalUtils';
 import { ProductContext } from '../../context/product-context';
 import DateFnsUtils from '@date-io/date-fns';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker
-} from '@material-ui/pickers';
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import './CreateProduct.css';
 
 const initialValues = {
@@ -22,17 +19,9 @@ const initialValues = {
 const CreateProduct = () => {
     
     const [values, setValues] = useState(initialValues);
-    // const [productCategories, setProductCategories] = useState([]);
     const [productCategory, setProductCategory] = useState('');
     const [errors, setErrors] = useState({});
     const { updateProducts, productCategories } = useContext(ProductContext);
-    
-    // useEffect(() => {
-    //     axios.get('/products/categories')
-    //         .then(({ data }) => {
-    //             setProductCategories(data.content);
-    //         });
-    // }, []);
     
     const validate = () => {
         let errs = {};
@@ -69,17 +58,6 @@ const CreateProduct = () => {
         });
     };
     
-    const handlePriceChange = (event) => {
-        setValues({
-            ...values,
-            price: event.target.value
-        });
-        setErrors({
-            ...errors,
-            price: ''
-        });
-    };
-    
     const handleLaunchDateChange = (date) => {
         setValues({
             ...values,
@@ -104,7 +82,7 @@ const CreateProduct = () => {
             }).then(({ data }) => {
                 SwalUtils.closeSwal();
                 SwalUtils.showSuccessSwal(data.message);
-                updateProducts();
+                updateProducts({});
             }).catch((error) => {
                 SwalUtils.closeSwal();
                 SwalUtils.showErrorSwal(error?.response?.data?.message || 'Something went wrong!');
@@ -162,7 +140,7 @@ const CreateProduct = () => {
                     />
                 </Grid>
                 <Grid item xs={4}>
-                    <FormControl error={!!errors.launchDate}>
+                    <FormControl fullWidth={true} error={!!errors.launchDate}>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardDatePicker
                                 error={!!errors.launchDate}
