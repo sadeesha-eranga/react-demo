@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, FormHelperText } from '@material-ui/core';
 import NumberFormat from 'react-number-format';
 import axios from '../../utils/axios';
 import SwalUtils from '../../utils/SwalUtils';
@@ -23,8 +23,8 @@ const CreateProduct = () => {
     
     const [values, setValues] = useState(initialValues);
     const [productCategories, setProductCategories] = useState([]);
-    const [product, setProduct] = useState({ name: '', description: '' });
     const [productCategory, setProductCategory] = useState('');
+    const [errors, setErrors] = useState({});
     const { updateProducts } = useContext(ProductContext);
     
     useEffect(() => {
@@ -33,6 +33,16 @@ const CreateProduct = () => {
                 setProductCategories(data.content);
             });
     }, []);
+    
+    const validate = () => {
+        let errs = {};
+        errs.name = values.name ? '' : 'Please enter a valid product title';
+        errs.price = values.price && values.price > 0 ? '' : 'Please enter a valid price';
+        errs.launchDate = values.launchDate ? '' : 'Please select a launch date';
+        errs.productCategoryId = values.productCategoryId ? '' : 'Please select a product category';
+        setErrors(errs);
+        return Object.values(errs).every(value => value === '');
+    };
     
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -66,22 +76,30 @@ const CreateProduct = () => {
         
     };
     
-    const onSaveButtonClick = () => {
-        SwalUtils.showLoadingSwal();
-        axios.post('/products', product).then(({ data }) => {
-            SwalUtils.closeSwal();
-            SwalUtils.showSuccessSwal(data.message);
-            updateProducts();
-        }).catch((error) => {
-            SwalUtils.closeSwal();
-            SwalUtils.showErrorSwal(error?.response?.data?.message || 'Something went wrong!');
-        });
-        setProduct({ name: '', description: '', price: '', productCategoryId: '' });
-        setProductCategory('');
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        if (validate()) {
+            SwalUtils.showLoadingSwal();
+            axios.post('/products', {
+                name: values.name,
+                description: values.description,
+                price: values.price,
+                launchDate: values.launchDate,
+                productCategoryId: values.productCategoryId
+            }).then(({ data }) => {
+                SwalUtils.closeSwal();
+                SwalUtils.showSuccessSwal(data.message);
+                updateProducts();
+            }).catch((error) => {
+                SwalUtils.closeSwal();
+                SwalUtils.showErrorSwal(error?.response?.data?.message || 'Something went wrong!');
+            });
+            setValues(initialValues);
+        }
     };
     
     return (
-        <div>
+        <form autoComplete={'off'} onSubmit={handleSubmit}>
             <Grid
                 container
                 direction="row"
@@ -96,7 +114,9 @@ const CreateProduct = () => {
                         label="Product Title"
                         name={'name'}
                         value={values.name}
-                        fullWidth={true} variant="outlined"/>
+                        fullWidth={true}
+                        {...(errors?.name && { error: true, helperText: errors.name })}
+                        variant="outlined"/>
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -107,6 +127,7 @@ const CreateProduct = () => {
                         rows={2}
                         size={'small'}
                         label="Product Description"
+                        {...(errors?.description && { error: true, helperText: errors.description })}
                         fullWidth={true} variant="outlined"/>
                 </Grid>
                 <Grid item xs={12}>
@@ -118,34 +139,39 @@ const CreateProduct = () => {
                         variant={'outlined'}
                         fullWidth={true}
                         onChange={handlePriceChange}
+                        {...(errors?.price && { error: true, helperText: errors.price })}
                         InputProps={{
                             inputComponent: NumberFormatCustom
                         }}
                     />
                 </Grid>
                 <Grid item xs={4}>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardDatePicker
-                            className={'DatePicker'}
-                            autoOk={true}
-                            disableToolbar
-                            disablePast
-                            variant="inline"
-                            inputVariant="outlined"
-                            format="dd-MM-yyyy"
-                            id="date-picker-inline"
-                            label="Launch Date"
-                            value={values.launchDate}
-                            name={'launchDate'}
-                            onChange={handleLaunchDateChange}
-                            KeyboardButtonProps={{
-                                'aria-label': 'change date',
-                            }}
-                        />
-                    </MuiPickersUtilsProvider>
+                    <FormControl error={!!errors.launchDate}>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <KeyboardDatePicker
+                                error={!!errors.launchDate}
+                                className={'DatePicker'}
+                                autoOk={true}
+                                disableToolbar
+                                disablePast
+                                variant="inline"
+                                inputVariant="outlined"
+                                format="dd-MM-yyyy"
+                                id="date-picker-inline"
+                                label="Launch Date"
+                                value={values.launchDate}
+                                name={'launchDate'}
+                                onChange={handleLaunchDateChange}
+                                KeyboardButtonProps={{
+                                    'aria-label': 'change date',
+                                }}
+                            />
+                        </MuiPickersUtilsProvider>
+                        {errors.launchDate && <FormHelperText>{errors.launchDate}</FormHelperText> }
+                    </FormControl>
                 </Grid>
                 <Grid item xs={8}>
-                    <FormControl fullWidth={true} variant="outlined">
+                    <FormControl error={!!errors.productCategoryId} fullWidth={true} variant="outlined">
                         <InputLabel id={'category-label'}>Product Category</InputLabel>
                         <Select
                             onChange={handleCategoryChange}
@@ -162,15 +188,16 @@ const CreateProduct = () => {
                                 </MenuItem>
                             ))}
                         </Select>
+                        {errors.productCategoryId && <FormHelperText>{errors.productCategoryId}</FormHelperText> }
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                    <Button fullWidth={true} variant={'contained'} color="primary" onClick={onSaveButtonClick}>
+                    <Button fullWidth={true} variant={'contained'} color="primary" type={'submit'}>
                         Save Product
                     </Button>
                 </Grid>
             </Grid>
-        </div>
+        </form>
     );
 };
 
