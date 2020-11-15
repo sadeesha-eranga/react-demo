@@ -22,21 +22,21 @@ const initialValues = {
 const CreateProduct = () => {
     
     const [values, setValues] = useState(initialValues);
-    const [productCategories, setProductCategories] = useState([]);
+    // const [productCategories, setProductCategories] = useState([]);
     const [productCategory, setProductCategory] = useState('');
     const [errors, setErrors] = useState({});
-    const { updateProducts } = useContext(ProductContext);
+    const { updateProducts, productCategories } = useContext(ProductContext);
     
-    useEffect(() => {
-        axios.get('/products/categories')
-            .then(({ data }) => {
-                setProductCategories(data.content);
-            });
-    }, []);
+    // useEffect(() => {
+    //     axios.get('/products/categories')
+    //         .then(({ data }) => {
+    //             setProductCategories(data.content);
+    //         });
+    // }, []);
     
     const validate = () => {
         let errs = {};
-        errs.name = values.name ? '' : 'Please enter a valid product title';
+        errs.name = values.name && values.name.trim() !== '' ? '' : 'Please enter a valid product title';
         errs.price = values.price && values.price > 0 ? '' : 'Please enter a valid price';
         errs.launchDate = values.launchDate ? '' : 'Please select a launch date';
         errs.productCategoryId = values.productCategoryId ? '' : 'Please select a product category';
@@ -50,6 +50,10 @@ const CreateProduct = () => {
             ...values,
             [name]: value
         });
+        setErrors({
+            ...errors,
+            [name]: ''
+        });
     };
     
     const handleCategoryChange = (event) => {
@@ -59,12 +63,20 @@ const CreateProduct = () => {
             ...values,
             productCategoryId: category
         });
+        setErrors({
+            ...errors,
+            productCategoryId: ''
+        });
     };
     
     const handlePriceChange = (event) => {
         setValues({
             ...values,
             price: event.target.value
+        });
+        setErrors({
+            ...errors,
+            price: ''
         });
     };
     
@@ -73,7 +85,10 @@ const CreateProduct = () => {
             ...values,
             launchDate: date
         });
-        
+        setErrors({
+            ...errors,
+            launchDate: ''
+        });
     };
     
     const handleSubmit = (event) => {
@@ -95,6 +110,7 @@ const CreateProduct = () => {
                 SwalUtils.showErrorSwal(error?.response?.data?.message || 'Something went wrong!');
             });
             setValues(initialValues);
+            setProductCategory('');
         }
     };
     
@@ -138,7 +154,7 @@ const CreateProduct = () => {
                         label="Product Price"
                         variant={'outlined'}
                         fullWidth={true}
-                        onChange={handlePriceChange}
+                        onChange={handleInputChange}
                         {...(errors?.price && { error: true, helperText: errors.price })}
                         InputProps={{
                             inputComponent: NumberFormatCustom

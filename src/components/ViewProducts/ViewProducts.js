@@ -36,7 +36,7 @@ const ViewProducts = () => {
                     .then(() => {
                         SwalUtils.closeSwal();
                         SwalUtils.showSuccessSwal('You have deleted this product!');
-                        updateProducts();
+                        updateProducts({});
                     })
                     .catch((error) => {
                         SwalUtils.closeSwal();
@@ -47,49 +47,47 @@ const ViewProducts = () => {
     };
     
     return (
-        <div>
-            <Paper className={'root'} elevation={4}>
-                <TableContainer className={'container'}>
-                    <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align={'left'}>Name</TableCell>
-                                <TableCell align={'left'}>Description</TableCell>
-                                <TableCell align={'right'}>Price</TableCell>
-                                <TableCell align={'center'}>Launch Date</TableCell>
-                                <TableCell align={'center'}>Actions</TableCell>
+        <Paper className={'root'} elevation={4}>
+            <TableContainer className={'container'}>
+                <Table stickyHeader aria-label="sticky table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align={'left'}>Name</TableCell>
+                            <TableCell align={'left'}>Description</TableCell>
+                            <TableCell align={'right'}>Price</TableCell>
+                            <TableCell align={'center'}>Launch Date</TableCell>
+                            <TableCell align={'center'}>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {products.map((product) => (
+                            <TableRow hover role="checkbox" tabIndex={-1} key={product.productId}>
+                                <TableCell align={'left'}>{product.name}</TableCell>
+                                <TableCell align={'left'}>{product.description}</TableCell>
+                                <TableCell align={'right'}>{product.price.toFixed(2)}</TableCell>
+                                <TableCell align={'center'}>{product.launchDate}</TableCell>
+                                <TableCell align={'center'}>
+                                    <IconButton className={'DeleteButton'}
+                                                onClick={() => handleDelete(product.productId)}
+                                                component="span">
+                                        <DeleteIcon/>
+                                    </IconButton>
+                                </TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {products.map((product) => (
-                                <TableRow hover role="checkbox" tabIndex={-1} key={product.productId}>
-                                    <TableCell align={'left'}>{product.name}</TableCell>
-                                    <TableCell align={'left'}>{product.description}</TableCell>
-                                    <TableCell align={'right'}>{product.price.toFixed(2)}</TableCell>
-                                    <TableCell align={'center'}>{product.launchDate}</TableCell>
-                                    <TableCell align={'center'}>
-                                        <IconButton className={'DeleteButton'}
-                                                    onClick={() => handleDelete(product.productId)}
-                                                    component="span">
-                                            <DeleteIcon/>
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
-                    component="div"
-                    count={count}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                />
-            </Paper>
-        </div>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={[10, 25, 100]}
+                component="div"
+                count={count}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+        </Paper>
     );
 };
 
