@@ -32,6 +32,7 @@ const ProductsProvider = props => {
                         setPage(page - 1);
                     } else {
                         setProducts([]);
+                        setCount(0);
                     }
                 }
             }).catch(() => SwalUtils.showErrorSwal("Couldn't fetch data from the server!"));
