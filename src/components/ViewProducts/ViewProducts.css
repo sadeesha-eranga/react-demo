@@ -1,0 +1,11 @@
+.DeleteButton:hover {
+    color: red !important;
+}
+
+.root {
+    width: 100%
+}
+
+.container {
+    max-height: 500px
+}

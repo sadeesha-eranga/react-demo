@@ -9,25 +9,14 @@ import {
     TablePagination,
     TableRow
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import axios from '../utils/axios';
+import axios from '../../utils/axios';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
-import SwalUtils from '../utils/SwalUtils';
-import { ProductContext } from '../context/product-context';
-
-const useStyles = makeStyles({
-    root: {
-        width: '100%',
-    },
-    container: {
-        maxHeight: 500,
-    },
-});
+import SwalUtils from '../../utils/SwalUtils';
+import { ProductContext } from '../../context/product-context';
+import './ViewProducts.css';
 
 const ViewProducts = () => {
-    const classes = useStyles();
-    
     const { setPage, setRowsPerPage, products, count, page, rowsPerPage, updateProducts } = useContext(ProductContext);
     
     const handleChangePage = (event, newPage) => {
@@ -59,14 +48,15 @@ const ViewProducts = () => {
     
     return (
         <div>
-            <Paper className={classes.root} elevation={4}>
-                <TableContainer className={classes.container}>
+            <Paper className={'root'} elevation={4}>
+                <TableContainer className={'container'}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
                                 <TableCell align={'left'}>Name</TableCell>
                                 <TableCell align={'left'}>Description</TableCell>
                                 <TableCell align={'right'}>Price</TableCell>
+                                <TableCell align={'center'}>Launch Date</TableCell>
                                 <TableCell align={'center'}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -76,8 +66,11 @@ const ViewProducts = () => {
                                     <TableCell align={'left'}>{product.name}</TableCell>
                                     <TableCell align={'left'}>{product.description}</TableCell>
                                     <TableCell align={'right'}>{product.price.toFixed(2)}</TableCell>
+                                    <TableCell align={'center'}>{product.launchDate}</TableCell>
                                     <TableCell align={'center'}>
-                                        <IconButton onClick={() => handleDelete(product.productId)} component="span">
+                                        <IconButton className={'DeleteButton'}
+                                                    onClick={() => handleDelete(product.productId)}
+                                                    component="span">
                                             <DeleteIcon/>
                                         </IconButton>
                                     </TableCell>

@@ -1,12 +1,27 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 import NumberFormat from 'react-number-format';
-import axios from '../utils/axios';
-import SwalUtils from '../utils/SwalUtils';
-import { ProductContext } from '../context/product-context';
+import axios from '../../utils/axios';
+import SwalUtils from '../../utils/SwalUtils';
+import { ProductContext } from '../../context/product-context';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+    MuiPickersUtilsProvider,
+    KeyboardDatePicker
+} from '@material-ui/pickers';
+import './CreateProduct.css';
+
+const initialValues = {
+    name: '',
+    description: '',
+    price: '',
+    productCategoryId: '',
+    launchDate: new Date()
+};
 
 const CreateProduct = () => {
     
+    const [values, setValues] = useState(initialValues);
     const [productCategories, setProductCategories] = useState([]);
     const [product, setProduct] = useState({ name: '', description: '' });
     const [productCategory, setProductCategory] = useState('');
@@ -19,15 +34,36 @@ const CreateProduct = () => {
             });
     }, []);
     
-    const onCategoryChange = (event) => {
-        const category = event.target.value;
-        setProductCategory(category);
-        product.productCategoryId = category;
-        setProduct(product);
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setValues({
+            ...values,
+            [name]: value
+        });
     };
     
-    const onPriceChange = (event) => {
-        setProduct({ ...product, price: event.target.value });
+    const handleCategoryChange = (event) => {
+        const category = event.target.value;
+        setProductCategory(category);
+        setValues({
+            ...values,
+            productCategoryId: category
+        });
+    };
+    
+    const handlePriceChange = (event) => {
+        setValues({
+            ...values,
+            price: event.target.value
+        });
+    };
+    
+    const handleLaunchDateChange = (date) => {
+        setValues({
+            ...values,
+            launchDate: date
+        });
+        
     };
     
     const onSaveButtonClick = () => {
@@ -55,16 +91,18 @@ const CreateProduct = () => {
             >
                 <Grid item xs={12}>
                     <TextField
-                        value={product.name}
-                        onChange={e => setProduct({ ...product, name: e.target.value })}
+                        onChange={handleInputChange}
                         size={'small'}
                         label="Product Title"
+                        name={'name'}
+                        value={values.name}
                         fullWidth={true} variant="outlined"/>
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
-                        value={product.description}
-                        onChange={e => setProduct({ ...product, description: e.target.value })}
+                        name={'description'}
+                        value={values.description}
+                        onChange={handleInputChange}
                         multiline={true}
                         rows={2}
                         size={'small'}
@@ -73,22 +111,44 @@ const CreateProduct = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
-                        value={product.price}
+                        name={'price'}
+                        value={values.price}
                         size={'small'}
                         label="Product Price"
                         variant={'outlined'}
                         fullWidth={true}
-                        onChange={onPriceChange}
+                        onChange={handlePriceChange}
                         InputProps={{
-                            inputComponent: NumberFormatCustom,
+                            inputComponent: NumberFormatCustom
                         }}
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={4}>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <KeyboardDatePicker
+                            className={'DatePicker'}
+                            autoOk={true}
+                            disableToolbar
+                            disablePast
+                            variant="inline"
+                            inputVariant="outlined"
+                            format="dd-MM-yyyy"
+                            id="date-picker-inline"
+                            label="Launch Date"
+                            value={values.launchDate}
+                            name={'launchDate'}
+                            onChange={handleLaunchDateChange}
+                            KeyboardButtonProps={{
+                                'aria-label': 'change date',
+                            }}
+                        />
+                    </MuiPickersUtilsProvider>
+                </Grid>
+                <Grid item xs={8}>
                     <FormControl fullWidth={true} variant="outlined">
                         <InputLabel id={'category-label'}>Product Category</InputLabel>
                         <Select
-                            onChange={onCategoryChange}
+                            onChange={handleCategoryChange}
                             label="Product Category"
                             labelId="category-label"
                             variant="outlined"

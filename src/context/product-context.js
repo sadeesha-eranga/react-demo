@@ -46,7 +46,7 @@ const ProductsProvider = props => {
                 setProducts(data.content);
                 setPage(data.pageable.pageNumber);
                 setRowsPerPage(data.pageable.pageSize);
-            }).catch(() => SwalUtils.showErrorSwal("Couldn't fetch data from the server!"));;
+            }).catch(() => SwalUtils.showErrorSwal("Couldn't fetch data from the server!"));
     }, [page, rowsPerPage]);
     
     return (

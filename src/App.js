@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
-import CreateProduct from './components/CreateProduct';
-import ViewProducts from './components/ViewProducts';
+import CreateProduct from './components/CreateProduct/CreateProduct';
+import ViewProducts from './components/ViewProducts/ViewProducts';
 import Divider from '@material-ui/core/Divider';
 import ProductsProvider from './context/product-context';
 
