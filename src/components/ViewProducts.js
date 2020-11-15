@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import {
     Paper,
     Table,
@@ -14,6 +14,7 @@ import axios from '../utils/axios';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import SwalUtils from '../utils/SwalUtils';
+import { ProductContext } from '../context/product-context';
 
 const useStyles = makeStyles({
     root: {
@@ -24,11 +25,10 @@ const useStyles = makeStyles({
     },
 });
 
-const ViewProduct = () => {
+const ViewProducts = () => {
     const classes = useStyles();
-    const [products, setProducts] = useState([]);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    
+    const { setPage, setRowsPerPage, products, count, page, rowsPerPage, updateProducts } = useContext(ProductContext);
     
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -39,21 +39,15 @@ const ViewProduct = () => {
         setPage(0);
     };
     
-    useEffect(() => {
-        axios.get(`/products?page=${page}&size=${rowsPerPage}`)
-            .then((response) => {
-                setProducts(response.data.content);
-            });
-    }, [page, rowsPerPage]);
-    
     const handleDelete = (productId) => {
         SwalUtils.showConfirmationSwal('Do you want to delete this product?').then((result) => {
             if (result.value) {
                 SwalUtils.showLoadingSwal();
                 axios.delete(`/products/${productId}`)
-                    .then(({ data }) => {
+                    .then(() => {
                         SwalUtils.closeSwal();
                         SwalUtils.showSuccessSwal('You have deleted this product!');
+                        updateProducts();
                     })
                     .catch((error) => {
                         SwalUtils.closeSwal();
@@ -65,7 +59,7 @@ const ViewProduct = () => {
     
     return (
         <div>
-            <Paper className={classes.root}>
+            <Paper className={classes.root} elevation={4}>
                 <TableContainer className={classes.container}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
@@ -95,7 +89,7 @@ const ViewProduct = () => {
                 <TablePagination
                     rowsPerPageOptions={[10, 25, 100]}
                     component="div"
-                    count={products.length}
+                    count={count}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onChangePage={handleChangePage}
@@ -106,4 +100,4 @@ const ViewProduct = () => {
     );
 };
 
-export default ViewProduct;
+export default ViewProducts;

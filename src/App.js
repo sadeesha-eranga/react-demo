@@ -1,15 +1,20 @@
 import React from 'react';
 import './App.css';
 import CreateProduct from './components/CreateProduct';
-import ViewProduct from './components/ViewProduct';
+import ViewProducts from './components/ViewProducts';
 import Divider from '@material-ui/core/Divider';
+import ProductsProvider from './context/product-context';
 
 function App() {
     return (
         <div className="app">
-            <CreateProduct/>
-            <Divider style={{ marginTop: 20, marginBottom: 20 }}/>
-            <ViewProduct/>
+            <ProductsProvider>
+                <CreateProduct/>
+                <Divider
+                    style={{ marginTop: 20, marginBottom: 20 }}
+                />
+                <ViewProducts/>
+            </ProductsProvider>
         </div>
     );
 }

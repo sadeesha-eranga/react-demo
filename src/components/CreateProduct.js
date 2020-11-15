@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 import NumberFormat from 'react-number-format';
 import axios from '../utils/axios';
 import SwalUtils from '../utils/SwalUtils';
+import { ProductContext } from '../context/product-context';
 
 const CreateProduct = () => {
     
     const [productCategories, setProductCategories] = useState([]);
     const [product, setProduct] = useState({ name: '', description: '' });
     const [productCategory, setProductCategory] = useState('');
+    const { updateProducts } = useContext(ProductContext);
     
     useEffect(() => {
         axios.get('/products/categories')
@@ -31,9 +33,9 @@ const CreateProduct = () => {
     const onSaveButtonClick = () => {
         SwalUtils.showLoadingSwal();
         axios.post('/products', product).then(({ data }) => {
-            console.log(data);
             SwalUtils.closeSwal();
             SwalUtils.showSuccessSwal(data.message);
+            updateProducts();
         }).catch((error) => {
             SwalUtils.closeSwal();
             SwalUtils.showErrorSwal(error?.response?.data?.message || 'Something went wrong!');
@@ -103,7 +105,7 @@ const CreateProduct = () => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                    <Button fullWidth={true} variant="outlined" color="primary" onClick={onSaveButtonClick}>
+                    <Button fullWidth={true} variant={'contained'} color="primary" onClick={onSaveButtonClick}>
                         Save Product
                     </Button>
                 </Grid>

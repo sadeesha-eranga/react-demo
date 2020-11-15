@@ -17,7 +17,7 @@ export default class SwalUtils {
     
     static showSuccessSwal(msg) {
         swal.fire(
-            'Successfull!',
+            'Successful!',
             msg,
             'success'
         )
@@ -25,7 +25,7 @@ export default class SwalUtils {
     
     static showErrorSwal(msg) {
         swal.fire(
-            'Cancelled',
+            'Error!',
             msg,
             'error'
         )
